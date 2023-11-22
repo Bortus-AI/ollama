@@ -5,8 +5,9 @@ services:
     hostname: ollama
     container_name: ollama
     build:
-      context: ./docker/ollama
-      dockerfile: Dockerfile
+      runs-on: self-hosted
+        context: ./docker/ollama
+        dockerfile: Dockerfile
     ports:
       - "11434:11434"
     volumes:
