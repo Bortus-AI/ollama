@@ -1,24 +1,33 @@
+name: CI
 
-version: '3'
-services:
-  ollama:
-    hostname: ollama
-    container_name: ollama
-    build:
-      runs-on: self-hosted
-        context: ./docker/ollama
-        dockerfile: Dockerfile
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/app
-    networks:
-      - net
+# When to run the GitHub Actions workflow
+on: [push, pull_request]
 
-volumes:
-  ollama_data:
-    driver: local
+jobs:
+  build-and-run-service:
+    runs-on: [self-hosted, linux] # This should match your self-hosted runner configuration
 
-networks:
-  net:
-    driver: bridge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE
+
+      - name: Build Docker image
+        run: |
+          docker build -t ollama ./docker/ollama
+
+      - name: Create Docker network
+        run: |
+          docker network create net
+
+      - name: Create Docker volume
+        run: |
+          docker volume create ollama_data
+
+      - name: Run Docker container
+        run: |
+          docker run -d --name ollama \
+                     --hostname ollama \
+                     -p 11434:11434 \
+                     -v ollama_data:/app \
+                     --network net \
+                     ollama
