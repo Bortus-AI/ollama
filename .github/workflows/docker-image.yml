@@ -1,0 +1,23 @@
+
+version: '3'
+services:
+  ollama:
+    hostname: ollama
+    container_name: ollama
+    build:
+      context: ./docker/ollama
+      dockerfile: Dockerfile
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/app
+    networks:
+      - net
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
